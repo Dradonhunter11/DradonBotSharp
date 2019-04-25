@@ -103,13 +103,15 @@ namespace DradonBotSharp.Services
                         author.IconUrl = message.Author.GetAvatarUrl();
                         builder.WithAuthor(author);
                         if(message.Content != "")
-                            builder.AddField(BotUtils.CreateEmbdedField("Message Content", message.Content));
-                        builder.AddField(BotUtils.CreateEmbdedField("Message ID", message.Id));
-                        builder.WithImageUrl(message.Attachments.ToList()[0].ProxyUrl);
+                            builder.AddField(BotUtils.CreateEmbdedField("Message Content", message.Content, false));
+                        if(message.Attachments.Count != 0)
+                            builder.WithImageUrl(message.Attachments.ToList()[0].ProxyUrl);
                         builder.WithUrl(message.GetJumpUrl());
                         builder.WithTitle("Go to the message");
                         await guildChannel.Guild.GetTextChannel((ulong) _json.GetFeaturedChannel((long) channel.Id))
                             .SendMessageAsync("", false, builder.Build());
+                        _json.AddMessageID((long)channel.Id,(long)message.Id);
+                        _json.Saveconfig();
                     }
                 }
                 catch (Exception e)

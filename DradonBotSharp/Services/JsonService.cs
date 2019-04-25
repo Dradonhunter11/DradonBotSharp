@@ -111,6 +111,11 @@ namespace DradonBotSharp.Services
         {
             return channels.Single(i => i.SubmitChannel == id).FeaturedChannel;
         }
+
+        public void AddMessageID(long channelID, long messageID)
+        {
+            channels.Single(i => i.SubmitChannel == channelID).featuredMessageID.Add(messageID);
+        }
     }
 
     internal class SpecialFeaturedChannel
