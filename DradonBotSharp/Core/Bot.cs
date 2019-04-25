@@ -36,6 +36,7 @@ namespace DradonBotSharp.Core
                 .AddSingleton<CommandManagerService>()
                 .AddSingleton<CommandService>()
                 .AddSingleton<SQLDatabaseService>()
+                .AddSingleton<JsonService>()
                 .BuildServiceProvider();
         }
 
@@ -51,6 +52,7 @@ namespace DradonBotSharp.Core
 
                 await _serviceProvider.GetRequiredService<CommandManagerService>().Initialize();
                 await _serviceProvider.GetRequiredService<SQLDatabaseService>().Initialize();
+                await _serviceProvider.GetService<JsonService>().Initialize();
 
                 await Task.Delay(-1);
             }

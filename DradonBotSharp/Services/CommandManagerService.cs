@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using Discord.Rest;
 using Discord.WebSocket;
 using DradonBotSharp.Core;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +20,7 @@ namespace DradonBotSharp.Services
         private readonly IServiceProvider _services;
         private readonly CommandService _commands;
         private readonly SQLDatabaseService _mySqlDatabase;
+        private readonly JsonService _json;
 
         public CommandManagerService(IServiceProvider service)
         {
@@ -25,6 +28,7 @@ namespace DradonBotSharp.Services
             _socketClient = service.GetRequiredService<DiscordSocketClient>();
             _commands = service.GetRequiredService<CommandService>();
             _mySqlDatabase = service.GetRequiredService<SQLDatabaseService>();
+            _json = service.GetRequiredService<JsonService>();
             _services = service;
 
             _socketClient.GuildMemberUpdated += UpdateRoleEvent;
@@ -60,12 +64,59 @@ namespace DradonBotSharp.Services
         public async Task AddRectionEvent(Cacheable<IUserMessage, ulong> MessageId, ISocketMessageChannel channel,
             SocketReaction reaction)
         {
-            Console.WriteLine($"Message Data : {MessageId.Value} : {MessageId.Id}");
-            Console.WriteLine($"Emote data : {reaction.Emote.Name}");
+            var guildChannel = channel as SocketGuildChannel;
+            try
+            {
+                
+                Console.WriteLine("---- An emote as been detected ----");
+                Console.WriteLine($"Guild Data : {guildChannel.Guild.Name}");
+                Console.WriteLine($"Guild ID : {guildChannel.Guild.Id}");
+                Console.WriteLine($"Channel Data : {channel.Name}");
+                Console.WriteLine($"Channel ID : {channel.Id}");
+                Console.WriteLine($"Message Data : {channel.GetMessageAsync(MessageId.Id).Result.Content}");
+                Console.WriteLine($"Message ID : {MessageId.Value} : {MessageId.Id}");
+                Console.WriteLine($"User Data : {channel.GetMessageAsync(MessageId.Id).Result.Author.Username}");
+                Console.WriteLine($"User ID : {channel.GetMessageAsync(MessageId.Id).Result.Author.Id}");
+                Console.WriteLine($"Emote data : {reaction.Emote.Name}");
+                Console.WriteLine("-----------------------------------");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            
 
-            if (reaction.Emote.Name == "⭐")
+            if (reaction.Emote.Name == "⭐" && _json.IsChannelFeatured((long) channel.Id))
             {
                 Console.WriteLine("it's a star!");
+
+                var message = channel.GetMessageAsync(MessageId.Id).Result as IUserMessage;
+                try
+                {
+
+                    if (_json.MetReactionRequirement(message, message.Reactions[reaction.Emote].ReactionCount))
+                    {
+                        EmbedBuilder builder = new EmbedBuilder();
+                        EmbedAuthorBuilder author = new EmbedAuthorBuilder();
+                        author.Name = message.Author.Username;
+                        author.IconUrl = message.Author.GetAvatarUrl();
+                        builder.WithAuthor(author);
+                        if(message.Content != "")
+                            builder.AddField(BotUtils.CreateEmbdedField("Message Content", message.Content));
+                        builder.AddField(BotUtils.CreateEmbdedField("Message ID", message.Id));
+                        builder.WithImageUrl(message.Attachments.ToList()[0].ProxyUrl);
+                        builder.WithUrl(message.GetJumpUrl());
+                        builder.WithTitle("Go to the message");
+                        await guildChannel.Guild.GetTextChannel((ulong) _json.GetFeaturedChannel((long) channel.Id))
+                            .SendMessageAsync("", false, builder.Build());
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+
             }
         }
     }

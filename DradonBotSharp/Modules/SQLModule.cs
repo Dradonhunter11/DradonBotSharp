@@ -68,5 +68,12 @@ namespace DradonBotSharp.Modules
         {
             await ReplyAsync(database.GetCommand(Context.Guild, commandName));
         }
+
+        [Command("Feature")]
+        [RequireContext(ContextType.Guild)]
+        public async Task FeatureChannel(IGuildChannel channel1, IGuildChannel channel2)
+        {
+
+        }
     }
 }

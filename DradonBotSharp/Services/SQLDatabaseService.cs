@@ -105,7 +105,7 @@ namespace DradonBotSharp.Services
             try
             {
                 string commandText =
-                    $"INSERT INTO customcommand(GuildID, Command, Message, CreatorID) VALUES ({guild.Id}, '{commandName}', '{commandMessage}', {user.Id})";
+                    $"INSERT INTO customcommand(GuildID, Command, Message, CreatorID) VALUES ({guild.Id}, '{commandName}', '{commandMessage.Replace("'","''")}', {user.Id})";
                 MySqlCommand command = new MySqlCommand(commandText, _connection);
                 command.ExecuteNonQuery();
                 return true;
@@ -122,7 +122,7 @@ namespace DradonBotSharp.Services
             try
             {
                 string commandText =
-                    $"UPDATE customcommand SET Message = '{commandMessage}' " +
+                    $"UPDATE customcommand SET Message = '{commandMessage.Replace("'", "''")}' " +
                     $"WHERE customcommand.GuildID = {guild.Id} AND customcommand.Command = '{commandName}' AND customcommand.CreatorID = {user.Id}";
                 MySqlCommand command = new MySqlCommand(commandText, _connection);
                 command.ExecuteNonQuery();
