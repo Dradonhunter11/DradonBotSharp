@@ -21,6 +21,7 @@ namespace DradonBotSharp.Services
         private readonly CommandService _commands;
         private readonly SQLDatabaseService _mySqlDatabase;
         private readonly JsonService _json;
+        
 
         public CommandManagerService(IServiceProvider service)
         {
@@ -34,6 +35,7 @@ namespace DradonBotSharp.Services
             _socketClient.GuildMemberUpdated += UpdateRoleEvent;
             _socketClient.MessageReceived += MessageReceivedAsync;
             _socketClient.ReactionAdded += AddRectionEvent;
+            
         }
 
         public async Task Initialize()
@@ -87,7 +89,7 @@ namespace DradonBotSharp.Services
             }
             
 
-            if (reaction.Emote.Name == "⭐" && _json.IsChannelFeatured((long) channel.Id))
+            if (reaction.Emote.Name == "⭐" && _json.IsChannelFeatured(channel.Id))
             {
                 Console.WriteLine("it's a star!");
 
@@ -95,7 +97,7 @@ namespace DradonBotSharp.Services
                 try
                 {
 
-                    if (_json.MetReactionRequirement(message, message.Reactions[reaction.Emote].ReactionCount))
+                    if (_json.MetReactionRequirement(channel.Id, message.Reactions[reaction.Emote].ReactionCount) && !_json.IsAlreadyFeatured(message))
                     {
                         EmbedBuilder builder = new EmbedBuilder();
                         EmbedAuthorBuilder author = new EmbedAuthorBuilder();
@@ -108,10 +110,10 @@ namespace DradonBotSharp.Services
                             builder.WithImageUrl(message.Attachments.ToList()[0].ProxyUrl);
                         builder.WithUrl(message.GetJumpUrl());
                         builder.WithTitle("Go to the message");
-                        await guildChannel.Guild.GetTextChannel((ulong) _json.GetFeaturedChannel((long) channel.Id))
+                        await guildChannel.Guild.GetTextChannel(_json.GetFeaturedChannel(channel.Id))
                             .SendMessageAsync("", false, builder.Build());
-                        _json.AddMessageID((long)channel.Id,(long)message.Id);
-                        _json.Saveconfig();
+                        _json.AddMessageID(channel.Id, message.Id);
+                        _json.SaveFeaturedChannelConfig();
                     }
                 }
                 catch (Exception e)

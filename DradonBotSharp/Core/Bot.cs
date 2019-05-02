@@ -37,6 +37,7 @@ namespace DradonBotSharp.Core
                 .AddSingleton<CommandService>()
                 .AddSingleton<SQLDatabaseService>()
                 .AddSingleton<JsonService>()
+                .AddSingleton<EasierRoleService>()
                 .BuildServiceProvider();
         }
 

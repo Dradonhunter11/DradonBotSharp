@@ -36,10 +36,11 @@ namespace DradonBotSharp.Modules
         }
 
         [Command("FeaturedChannel")]
+        [RequireUserPermission(GuildPermission.Administrator)]
         public async Task FeatureChannel(string submitchannelID, string featuredchannelID, string emote, int numberOfReaction)
         {
-            long submitID = long.Parse(submitchannelID.Replace("<#", "").Replace(">", ""));
-            long featuredID = long.Parse(featuredchannelID.Replace("<#", "").Replace(">", ""));
+            ulong submitID = ulong.Parse(submitchannelID.Replace("<#", "").Replace(">", ""));
+            ulong featuredID = ulong.Parse(featuredchannelID.Replace("<#", "").Replace(">", ""));
             await ReplyAsync(json.AddChannel(submitID, featuredID, emote, numberOfReaction));
         }
     }
