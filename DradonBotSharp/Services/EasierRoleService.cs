@@ -28,4 +28,9 @@ namespace DradonBotSharp.Services
             channels = new List<SpecialFeaturedChannel>();
         }
     }
+
+    public interface ITest
+    {
+        List<string> interfaceList { get; set; }
+    }
 }

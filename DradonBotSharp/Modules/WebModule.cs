@@ -71,15 +71,15 @@ namespace DradonBotSharp.Modules
                 builder.AddField(BotUtils.CreateEmbdedField("Mission Type",
                     json.GetInternalValue(parsedResult, "type")));
 
-                double time = (double) json.GetInternalValue(parsedResult, "startedat");
+                double time = double.Parse(json.GetInternalValue(parsedResult, "startedat").ToString());
                 DateTime date = ConvertFromUnixTimestamp(time);
-                string dateString = $"{date.Year}/{date.Month}/{date.Day}/{date.Hour}:{date.Minute}:{date.Second}";
+                string dateString = $"{date.Year}/{date.Month.ToString("D" + 2)}/{date.Day.ToString("D" + 2)}/{date.Hour.ToString("D"+2)}:{date.Minute.ToString("D" + 2)}:{date.Second.ToString("D" + 2)}";
                 builder.AddField(BotUtils.CreateEmbdedField("Start Time",
-                    dateString));
+                    dateString, false));
 
-                time = (double)json.GetInternalValue(parsedResult, "endsat");
-                date = ConvertFromUnixTimestamp(time);
-                dateString = $"{date.Year}/{date.Month}/{date.Day}/{date.Hour}:{date.Minute}:{date.Second}";
+                time = time + 3600000 * 5;
+                date = ConvertFromUnixTimestamp(time).ToLocalTime();
+                dateString = $"{date.Year}/{date.Month.ToString("D" + 2)}/{date.Day.ToString("D" + 2)}/{date.Hour.ToString("D" + 2)}:{date.Minute.ToString("D" + 2)}:{date.Second.ToString("D" + 2)}";
                 builder.AddField(BotUtils.CreateEmbdedField("EndTime",
                     dateString));
 
@@ -97,7 +97,7 @@ namespace DradonBotSharp.Modules
         public static DateTime ConvertFromUnixTimestamp(double timestamp)
         {
             DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-            return origin.AddSeconds(timestamp / 1000); // convert from milliseconds to seconds
+            return origin.AddSeconds(timestamp /1000); // convert from milliseconds to seconds
         }
 
         //TODO : Move in WebService

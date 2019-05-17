@@ -48,7 +48,7 @@ namespace DradonBotSharp.Core
                 _client = services.GetRequiredService<DiscordSocketClient>();
                 _serviceProvider = services;
 
-                await _client.LoginAsync(TokenType.Bot, "MzMzMDQxMTA2MzYwOTkxNzQ2.DMaxSw.Ds4jdDV843fn-MRU7HqyXaiN5Yk", false);
+                await _client.LoginAsync(TokenType.Bot, Token.BotToken(), false);
                 await _client.StartAsync();
 
                 await _serviceProvider.GetRequiredService<CommandManagerService>().Initialize();

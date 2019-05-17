@@ -6,6 +6,7 @@ namespace DradonBotSharp.Enums
 {
     internal enum GuildTags : byte
     {
-        warframe
+        warframe,
+        terraria
     }
 }

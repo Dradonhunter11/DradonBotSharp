@@ -67,9 +67,6 @@ namespace DradonBotSharp.Services
                 }
             }
             #endregion
-
-
-
         }
 
         #region featured channel
@@ -157,7 +154,7 @@ namespace DradonBotSharp.Services
 
         #endregion
 
-        #region Various helper command
+        #region Various helper utility
         public String GetInternalObject(string json, string fieldName)
         {
             JsonReader reader = new JsonTextReader(new StringReader(json));
@@ -193,8 +190,6 @@ namespace DradonBotSharp.Services
             return "null";
         }
         #endregion
-
-
     }
 
     /// <summary>
@@ -217,6 +212,9 @@ namespace DradonBotSharp.Services
         }
     }
 
+    /// <summary>
+    /// Doc
+    /// </summary>
     internal class SpecialFeaturedChannel
     {
         public ulong SubmitChannel { get; set; }
