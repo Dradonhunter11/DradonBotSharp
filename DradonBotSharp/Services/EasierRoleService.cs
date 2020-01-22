@@ -16,7 +16,6 @@ namespace DradonBotSharp.Services
         private readonly IServiceProvider _services;
         private readonly CommandService _commands;
 
-        private readonly List<SpecialFeaturedChannel> channels;
 
         public EasierRoleService(IServiceProvider service)
         {
@@ -24,13 +23,6 @@ namespace DradonBotSharp.Services
             _socketClient = service.GetRequiredService<DiscordSocketClient>();
             _commands = service.GetRequiredService<CommandService>();
             _services = service;
-
-            channels = new List<SpecialFeaturedChannel>();
         }
-    }
-
-    public interface ITest
-    {
-        List<string> interfaceList { get; set; }
     }
 }

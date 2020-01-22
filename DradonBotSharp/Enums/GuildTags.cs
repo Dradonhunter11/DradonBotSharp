@@ -4,9 +4,11 @@ using System.Text;
 
 namespace DradonBotSharp.Enums
 {
-    internal enum GuildTags : byte
+    public enum GuildTags
     {
         warframe,
-        terraria
+        terraria,
+		minecraft,
+		hypixel
     }
 }

@@ -9,9 +9,11 @@ using Discord;
 
 namespace DradonBotSharp.Modules
 {
+    /*
     public class SQLModule : ModuleBase<SocketCommandContext>
     {
         public SQLDatabaseService database { get; set; }
+
 
         [Command("dbTest")]
         [RequireContext(ContextType.Guild)]
@@ -79,5 +81,5 @@ namespace DradonBotSharp.Modules
         {
 
         }
-    }
+    }*/
 }

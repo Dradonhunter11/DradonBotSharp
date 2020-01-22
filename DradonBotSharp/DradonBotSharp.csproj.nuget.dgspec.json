@@ -53,6 +53,10 @@
             "MySql.Data": {
               "target": "Package",
               "version": "[8.0.15, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[12.0.2, )"
             }
           },
           "imports": [

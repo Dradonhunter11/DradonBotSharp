@@ -5,6 +5,6 @@ namespace DradonBotSharp
 {
     class Program
     {
-        static void Main(string[] args) => Bot.instance.Main().GetAwaiter().GetResult();
+        static void Main(string[] args) => Bot.Instance.Main().GetAwaiter().GetResult();
     }
 }

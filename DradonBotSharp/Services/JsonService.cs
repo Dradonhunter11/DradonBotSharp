@@ -8,14 +8,19 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using DradonBotSharp.Core;
+using DradonBotSharp.Market;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace DradonBotSharp.Services
 {
+    /// <summary>
+    /// Every json operation are done in this class
+    /// </summary>
     public class JsonService
     {
+        #region readonly variable
         private readonly Bot _bot;
         private readonly DiscordSocketClient _socketClient;
         private readonly IServiceProvider _services;
@@ -23,8 +28,14 @@ namespace DradonBotSharp.Services
         private readonly EasierRoleService _role;
 
         private readonly List<SpecialFeaturedChannel> channels;
-        
+        internal readonly List<TradeDataCache> marketData;
+        internal readonly List<GuildConfig> configs;
+        #endregion
 
+        /// <summary>
+        /// Constructor, import all the the required service from above
+        /// </summary>
+        /// <param name="service"></param>
         public JsonService(IServiceProvider service)
         {
             _bot = service.GetRequiredService<Bot>();
@@ -34,8 +45,15 @@ namespace DradonBotSharp.Services
             _services = service;
 
             channels = new List<SpecialFeaturedChannel>();
+            marketData = new List<TradeDataCache>();
+            configs = new List<GuildConfig>();
         }
 
+
+        /// <summary>
+        /// Load json file on startup, basically load config
+        /// </summary>
+        /// <returns></returns>
         public async Task Initialize()
         {
             string jsonPath = Path.Combine(Environment.CurrentDirectory, "json");
@@ -50,12 +68,19 @@ namespace DradonBotSharp.Services
             #region Featured Channel init
             if (File.Exists(Path.Combine(jsonPath, "feature.json")))
             {
-                reader = new JsonTextReader(new StringReader(File.OpenText(Path.Combine(jsonPath, "feature.json")).ReadToEnd()));
+                InitFeaturedChannel(jsonPath);
+            }
+            #endregion
+
+            #region market init
+            if (File.Exists(Path.Combine(jsonPath, "market.json")))
+            {
+                reader = new JsonTextReader(new StringReader(File.OpenText(Path.Combine(jsonPath, "market.json")).ReadToEnd()));
                 JArray array = JArray.Load(reader);
                 foreach (var value in array)
                 {
                     JsonSerializer serializer = JsonSerializer.Create();
-                    channels.Add(serializer.Deserialize<SpecialFeaturedChannel>(value.CreateReader()));
+                    marketData.Add(serializer.Deserialize<TradeDataCache>(value.CreateReader()));
 
                 }
 
@@ -65,10 +90,33 @@ namespace DradonBotSharp.Services
                     Console.WriteLine(specialFeaturedChannel.SubmitChannel);
                     Console.WriteLine(specialFeaturedChannel.FeaturedChannel);
                 }
-            }
+            }         
             #endregion
+
         }
 
+        private void InitFeaturedChannel(string jsonPath)
+        {
+            JsonTextReader reader;
+            reader = new JsonTextReader(new StringReader(File.OpenText(Path.Combine(jsonPath, "feature.json")).ReadToEnd()));
+            JArray array = JArray.Load(reader);
+            foreach (var value in array)
+            {
+                JsonSerializer serializer = JsonSerializer.Create();
+                channels.Add(serializer.Deserialize<SpecialFeaturedChannel>(value.CreateReader()));
+            }
+
+            foreach (var specialFeaturedChannel in channels)
+            {
+                Console.WriteLine("===");
+                Console.WriteLine(specialFeaturedChannel.SubmitChannel);
+                Console.WriteLine(specialFeaturedChannel.FeaturedChannel);
+            }
+        }
+
+        /// <summary>
+        /// All operation for the featured channel feature, to move in FeaturedChannel.cs
+        /// </summary>
         #region featured channel
         public void SaveFeaturedChannelConfig()
         {
@@ -132,6 +180,24 @@ namespace DradonBotSharp.Services
         }
         #endregion
 
+        #region market
+        public void SaveMarketConfig()
+        {
+            string json = JsonConvert.SerializeObject(marketData, Formatting.Indented);
+            string jsonPath = Path.Combine(Environment.CurrentDirectory, "json");
+
+            if (!Directory.Exists(Path.Combine(Environment.CurrentDirectory, "json")))
+            {
+                Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory, "json"));
+            }
+
+            File.WriteAllText(Path.Combine(jsonPath, "market.json"), json, Encoding.Unicode);
+        }
+        #endregion
+
+        /// <summary>
+        /// a w.i.p module that make mass role joining easier, using emote (and won't be bound to a message)
+        /// </summary>
         #region Easier Role Joining
 
         internal void SaveRole(List<JoinableRolePrefix> role)
@@ -154,6 +220,9 @@ namespace DradonBotSharp.Services
 
         #endregion
 
+        /// <summary>
+        /// Various method to help with json operation
+        /// </summary>
         #region Various helper utility
         public String GetInternalObject(string json, string fieldName)
         {
@@ -213,7 +282,7 @@ namespace DradonBotSharp.Services
     }
 
     /// <summary>
-    /// Doc
+    /// Simple data class for featured channel
     /// </summary>
     internal class SpecialFeaturedChannel
     {
